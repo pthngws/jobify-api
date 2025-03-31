@@ -1,7 +1,17 @@
-const express = require('express');
+const express = require("express");
+const connectDB = require("./config/db");
+
 const app = express();
 
-app.use(express.json()); // Middleware xử lý JSON
-app.use(express.urlencoded({ extended: true })); // Middleware xử lý form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+connectDB(); 
+
+app.get("/", (req, res) => {
+    res.json({ message: "Hello, world!" });
+});
+
+app.use("/api/auth", require("./routes/authRoutes"));
 
 module.exports = app;

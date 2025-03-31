@@ -1,11 +1,5 @@
-const express = require("express");
-const connectDB = require("./config/db");
+const app = require("./app"); // Import app.js
+require("dotenv").config(); // Nạp biến môi trường từ .env
+const PORT = process.env.PORT;
 
-const app = express();
-app.use(express.json());
-
-connectDB(); // Kết nối database
-
-app.use("/api/auth", require("./routes/auth"));
-
-app.listen(8080, () => console.log("🚀 Server is running on port 8080"));
+app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
