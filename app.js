@@ -1,4 +1,5 @@
 const express = require("express");
+
 const connectDB = require("./config/db");
 
 const app = express();
@@ -13,5 +14,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/jobs", require("./routes/jobRoutes"));
+app.use("/api/applications", require("./routes/applicationRoutes"));
+app.use("/api/companies", require("./routes/companyRoutes"));
+
+
 
 module.exports = app;
