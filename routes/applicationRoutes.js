@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const applicationController = require("../controllers/applicationController");
+const authenticateToken = require("../middlewares/authMiddleware");
 
 
-router.post("/", applicationController.createApplication);
-router.get("/", applicationController.getAllApplications);
-router.get("/:id", applicationController.getApplicationById);
-router.put("/:id", applicationController.updateApplicationStatus);
-router.delete("/:id", applicationController.deleteApplication);
+router.post("/",authenticateToken, applicationController.createApplication);
+router.get("/",authenticateToken, applicationController.getAllApplications);
+router.get("/:id",authenticateToken, applicationController.getApplicationById);
+router.put("/:id",authenticateToken, applicationController.updateApplicationStatus);
+router.delete("/:id",authenticateToken, applicationController.deleteApplication);
 
 module.exports = router;
