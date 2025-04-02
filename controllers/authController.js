@@ -71,13 +71,25 @@ const completeRegistration = async (req, res) => {
   }
 };
 
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Thiếu Refresh Token!" });
+    }
 
+    const { accessToken } = await authService.refreshAccessToken(refreshToken);
+    res.status(200).json({ accessToken });
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
 // Đăng nhập người dùng
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { user, token } = await authService.loginUser(email, password);
-    res.status(200).json({ message: "Đăng nhập thành công!", user, token });
+    const { user, accessToken,refreshToken } = await authService.loginUser(email, password);
+    res.status(200).json({ message: "Đăng nhập thành công!", user, accessToken,refreshToken });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -88,4 +100,4 @@ const logout = async (req, res) => {
   res.status(200).json({ message: "Đăng xuất thành công" });
 };
 
-module.exports = { register, login, logout, completeRegistration, forgetPassword, comfirmOtp, resetPassword };
+module.exports = { register, login, logout, completeRegistration, forgetPassword, comfirmOtp, resetPassword, refreshToken};
