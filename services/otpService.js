@@ -34,31 +34,32 @@ const storeOtp = async (email, password, role) => {
 };
 
 const verifyOtp = async (email, otp) => {
-    console.log(`ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ`);
-  
+
     // Lấy dữ liệu OTP từ Redis
     const data = await redisClient.get(`otp:${email}`);
     if (!data) {
-      console.log("Không tìm thấy OTP trong Redis hoặc OTP đã hết hạn.");
       throw new Error("OTP hết hạn hoặc không hợp lệ!");
     }
-  
-    console.log("Dữ liệu OTP từ Redis:", data);
-  
+
     const { otp: storedOtp, password, role } = JSON.parse(data);
-    console.log(`OTP từ Redis: ${storedOtp}, OTP nhập vào: ${otp}`);
   
     if (otp !== storedOtp) {
-      console.log("OTP không đúng!");
       throw new Error("OTP không đúng!");
     }
   
-    // Xóa OTP sau khi xác thực
     await redisClient.del(`otp:${email}`);
-    console.log("Đã xóa OTP sau khi xác thực");
   
     return { email, password, role };
   };
+
+  const storeOtpResetPassword = async (email)=>
+  {
+    const otp = generateOtp();
+    await redisClient.set(`otp:${email}`, JSON.stringify({ otp }), {
+      EX: 300, // Hết hạn sau 5 phút
+    });
+    await sendOtpEmail(email,otp);
+  }
   
 
-module.exports = { storeOtp, verifyOtp };
+module.exports = { storeOtp, verifyOtp,storeOtpResetPassword };

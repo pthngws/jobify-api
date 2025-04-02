@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const fs = require("fs"); // Import thư viện fs
 const cloudinary = require("../config/cloudinary");
+
+
 const getUserProfile = async (userId) => {
   try {
     // Lấy thông tin người dùng từ cơ sở dữ liệu, bỏ qua password
@@ -17,9 +19,7 @@ const getUserProfile = async (userId) => {
 
 const updateUserProfile = async (userId, avatar, cv, fullname) => {
   const user = await User.findById(userId);
-  if (!user) {
-    throw new Error("Người dùng không tồn tại!");
-  }
+  if (!user) { throw new Error("Người dùng không tồn tại!");}
 
   // Upload Avatar lên Cloudinary
   let avatarUrl = user.avatar; // Giữ nguyên nếu không thay đổi
@@ -67,4 +67,6 @@ const updateUserProfile = async (userId, avatar, cv, fullname) => {
 
   return user;
 };
+
+
 module.exports = { getUserProfile, updateUserProfile };
