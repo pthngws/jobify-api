@@ -1,15 +1,41 @@
 const authService = require("../services/authService");
+const otpService = require("../services/otpService");
+const User = require("../models/User");
 
 // Đăng ký người dùng mới
 const register = async (req, res) => {
   try {
     const { email, password, role } = req.body;
+
+    // Kiểm tra nếu email đã tồn tại
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email đã tồn tại!" });
+    }
+
+    // Gửi OTP & lưu vào Redis
+    await otpService.storeOtp(email, password, role);
+
+    res.status(200).json({ message: "OTP đã được gửi đến email của bạn!" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const completeRegistration = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    // Xác thực OTP & lấy thông tin từ Redis
+    const { password, role } = await otpService.verifyOtp(email, otp);
+
+    // Lưu vào database
     const { user, token } = await authService.registerUser(email, password, role);
     res.status(201).json({ message: "Đăng ký thành công!", user, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Đăng nhập người dùng
 const login = async (req, res) => {
@@ -22,4 +48,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+module.exports = { register, login, completeRegistration };

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const applicationController = require("../controllers/applicationController");
-const authenticateToken = require("../middlewares/authMiddleware");
+const authenticateToken = require("../middlewares/authenticateToken");
 
 
 router.post("/",authenticateToken, applicationController.createApplication);

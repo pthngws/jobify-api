@@ -3,7 +3,7 @@ const applicationService = require("../services/applicationService");
 const createApplication = async (req, res) => {
   try {
     const { job, resume, coverLetter } = req.body;
-    const applicant = req.user.id; // Lấy ID từ token đăng nhập
+    const applicant = req.user.id;
     const application = await applicationService.createApplication(job, applicant, resume, coverLetter);
     
     res.status(201).json(application);

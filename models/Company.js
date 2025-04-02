@@ -5,7 +5,9 @@ const CompanySchema = new mongoose.Schema({
   description: { type: String },
   location: { type: String, required: true },
   website: { type: String },
+  avatarUrl: { type: String },  // Avatar của công ty
   createdAt: { type: Date, default: Date.now },
+  recruiter: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },  // Người quản lý công ty (recruiter)
 });
 
 module.exports = mongoose.model("Company", CompanySchema);
