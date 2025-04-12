@@ -9,6 +9,8 @@ const authorizeRole = require("../middlewares/authorizeRole");
 router.post("/",authenticateToken,authorizeRole("candidate"), applicationController.createApplication);
 //Lấy danh sách ứng tuyển
 router.get("/job/:jobId",authenticateToken,authorizeRole("recruit"), applicationController.getAllApplicationsByJobId);
+
+router.get("/me",authenticateToken,authorizeRole("candidate"), applicationController.getAllApplicationsByJobApplicant);
 //Lấy danh sách ứng tuyển bởi Id
 router.get("/:id",authenticateToken,authorizeRole("recruit"), applicationController.getApplicationById);
 //Cập nhật trạng thái ứng tuyển

@@ -39,6 +39,24 @@ const getAllApplicationsByJobId = async (req, res) => {
   }
 };
 
+// Lấy danh sách ứng viên bởi ứng viên
+const getAllApplicationsByJobApplicant = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const applications = await applicationService.getApplicationsByApplicant(userId);
+
+    res.status(200).json({
+      success: true,
+      data: applications
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message
+    });
+  }
+};
+
 // Lấy cụ thể thông tin ứng tuyển
 const getApplicationById = async (req, res) => {
   try {
@@ -102,6 +120,7 @@ const deleteApplication = async (req, res) => {
 module.exports = {
   createApplication,
   getAllApplicationsByJobId,
+  getAllApplicationsByJobApplicant,
   getApplicationById,
   updateApplicationStatus,
   deleteApplication,

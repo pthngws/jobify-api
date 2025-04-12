@@ -8,6 +8,10 @@ const getAllApplicationsByJobId = async (jobId) => {
   return await Application.find({ job: jobId }).populate("applicant", "email fullName avatarUrl resumeUrl");
 };
 
+const getApplicationsByApplicant = async (applicantId) => {
+  return await Application.find({ applicant: applicantId }).populate("applicant", "email fullName avatarUrl resumeUrl");
+};
+
 const getApplicationById = async (id) => {
   return await Application.findById(id).populate("job applicant");
 };
@@ -23,6 +27,7 @@ const deleteApplication = async (id) => {
 module.exports = {
   createApplication,
   getAllApplicationsByJobId,
+  getApplicationsByApplicant,
   getApplicationById,
   updateApplicationStatus,
   deleteApplication,
