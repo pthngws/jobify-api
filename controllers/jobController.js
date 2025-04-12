@@ -35,7 +35,7 @@ const getJobsByCompany = async (req, res) => {
 // Lấy công việc theo ID
 const getJobById = async (req, res) => {
   try {
-    const job = await jobService.getJobById(req.params.id);
+    const job = await jobService.getJobById(req.params.jobId);
     res.status(200).json({ success: true, data: job });
   } catch (error) {
     res.status(404).json({ success: false, message: error.message });
@@ -46,7 +46,7 @@ const getJobById = async (req, res) => {
 const updateJob = async (req, res) => {
   try {
     const {title,description,requirements,location,salary,closingDate} = req.body;
-    const updatedJob = await jobService.updateJob(req.params.id, {title,description,requirements,location,salary,closingDate});
+    const updatedJob = await jobService.updateJob(req.params.jobId, {title,description,requirements,location,salary,closingDate});
     res.status(200).json({ success: true, data: updatedJob });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -56,7 +56,7 @@ const updateJob = async (req, res) => {
 // Xóa công việc
 const deleteJob = async (req, res) => {
   try {
-    await jobService.deleteJob(req.params.id);
+    await jobService.deleteJob(req.params.jobId);
     res.status(200).json({ success: true, message: "Công việc đã bị xóa!" });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

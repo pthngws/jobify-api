@@ -60,7 +60,7 @@ const getAllApplicationsByJobApplicant = async (req, res) => {
 // Lấy cụ thể thông tin ứng tuyển
 const getApplicationById = async (req, res) => {
   try {
-    const application = await applicationService.getApplicationById(req.params.id);
+    const application = await applicationService.getApplicationById(req.params.applicationId);
 
     if (!application) {
       return res.status(404).json({
@@ -85,7 +85,7 @@ const getApplicationById = async (req, res) => {
 const updateApplicationStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const updatedApplication = await applicationService.updateApplicationStatus(req.params.id, status);
+    const updatedApplication = await applicationService.updateApplicationStatus(req.params.applicationId, status);
 
     res.status(200).json({
       success: true,
@@ -103,7 +103,7 @@ const updateApplicationStatus = async (req, res) => {
 // Xóa đơn ứng tuyển
 const deleteApplication = async (req, res) => {
   try {
-    await applicationService.deleteApplication(req.params.id);
+    await applicationService.deleteApplication(req.params.applicationId);
 
     res.status(200).json({
       success: true,

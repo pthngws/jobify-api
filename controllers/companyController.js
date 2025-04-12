@@ -25,7 +25,7 @@ const getAllCompanies = async (req, res) => {
 //Lấy cụ thể công ty
 const getCompanyById = async (req, res) => {
   try {
-    const company = await companyService.getCompanyById(req.params.id);
+    const company = await companyService.getCompanyById(req.params.companyId);
     if (!company) return res.status(404).json({ error: "Không tìm thấy công ty!" });
     res.status(200).json(company);
   } catch (err) {
@@ -36,7 +36,7 @@ const getCompanyById = async (req, res) => {
 //Cập nhật công ty
 const updateCompany = async (req, res) => {
   try {
-    const updatedCompany = await companyService.updateCompany(req.params.id, req.body);
+    const updatedCompany = await companyService.updateCompany(req.params.companyId, req.body);
     if (!updatedCompany) return res.status(404).json({ error: "Không tìm thấy công ty!" });
     res.status(200).json(updatedCompany);
   } catch (err) {
@@ -47,7 +47,7 @@ const updateCompany = async (req, res) => {
 //Xóa công ty
 const deleteCompany = async (req, res) => {
   try {
-    await companyService.deleteCompany(req.params.id);
+    await companyService.deleteCompany(req.params.companyId);
     res.status(200).json({ message: "Đã xóa công ty!" });
   } catch (err) {
     res.status(400).json({ error: err.message });
