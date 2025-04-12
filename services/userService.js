@@ -22,7 +22,7 @@ const updateUserProfile = async (userId, avatar, cv, fullname) => {
   if (!user) { throw new Error("Người dùng không tồn tại!");}
 
   // Upload Avatar lên Cloudinary
-  let avatarUrl = user.avatar; // Giữ nguyên nếu không thay đổi
+  let avatarUrl = user.avatarUrl; // Giữ nguyên nếu không thay đổi
   if (avatar) {
     try {
       const avatarUpload = await cloudinary.uploader.upload(avatar, {
@@ -41,7 +41,7 @@ const updateUserProfile = async (userId, avatar, cv, fullname) => {
   }
 
   // Upload CV lên Cloudinary
-  let cvUrl = user.cv;
+  let cvUrl = user.resumeUrl;
   if (cv) {
     try {
       const cvUpload = await cloudinary.uploader.upload(cv, {
@@ -60,11 +60,12 @@ const updateUserProfile = async (userId, avatar, cv, fullname) => {
   }
 
   // Cập nhật thông tin user
-  user.avatar = avatarUrl;
-  user.cv = cvUrl;
-  user.fullname = fullname;
+  user.avatarUrl = avatarUrl;
+  user.resumeUrl = cvUrl;
+  if (fullname) {
+    user.fullName = fullname;
+  }
   await user.save();
-
   return user;
 };
 

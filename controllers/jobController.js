@@ -3,7 +3,9 @@ const jobService = require("../services/jobService");
 // Tạo công việc mới
 const createJob = async (req, res) => {
   try {
-    const job = await jobService.createJob(req.body);
+    const userId = req.user.userId;
+    const {title,description,requirements,location,salary,closingDate} = req.body;
+    const job = await jobService.createJob({userId,title,description,requirements,location,salary,closingDate});
     res.status(201).json({ success: true, data: job });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -33,7 +35,8 @@ const getJobById = async (req, res) => {
 // Cập nhật công việc
 const updateJob = async (req, res) => {
   try {
-    const updatedJob = await jobService.updateJob(req.params.id, req.body);
+    const {title,description,requirements,location,salary,closingDate} = req.body;
+    const updatedJob = await jobService.updateJob(req.params.id, {title,description,requirements,location,salary,closingDate});
     res.status(200).json({ success: true, data: updatedJob });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

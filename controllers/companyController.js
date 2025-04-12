@@ -1,15 +1,18 @@
 const companyService = require("../services/companyService");
 
+//Tạo công ty
 const createCompany = async (req, res) => {
   try {
-    const { name, description, location, website } = req.body;
-    const company = await companyService.createCompany(name, description, location, website);
+    const userId = req.user.userId;
+    const { name, description, location, website,avatarUrl } = req.body;
+    const company = await companyService.createCompany(userId,name, description, location, website,avatarUrl);
     res.status(201).json(company);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
+//Lấy danh sách các công ty
 const getAllCompanies = async (req, res) => {
   try {
     const companies = await companyService.getAllCompanies();
@@ -19,6 +22,7 @@ const getAllCompanies = async (req, res) => {
   }
 };
 
+//Lấy cụ thể công ty
 const getCompanyById = async (req, res) => {
   try {
     const company = await companyService.getCompanyById(req.params.id);
@@ -29,6 +33,7 @@ const getCompanyById = async (req, res) => {
   }
 };
 
+//Cập nhật công ty
 const updateCompany = async (req, res) => {
   try {
     const updatedCompany = await companyService.updateCompany(req.params.id, req.body);
@@ -39,6 +44,7 @@ const updateCompany = async (req, res) => {
   }
 };
 
+//Xóa công ty
 const deleteCompany = async (req, res) => {
   try {
     await companyService.deleteCompany(req.params.id);

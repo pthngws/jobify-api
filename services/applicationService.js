@@ -1,11 +1,11 @@
 const Application = require("../models/Application");
 
-const createApplication = async (job, applicant, resume, coverLetter) => {
-  return await Application.create({ job, applicant, resume, coverLetter });
+const createApplication = async (job, applicant, coverLetter) => {
+  return await Application.create({ job, applicant, coverLetter });
 };
 
-const getAllApplications = async () => {
-  return await Application.find().populate("job applicant");
+const getAllApplicationsByJobId = async (jobId) => {
+  return await Application.find({ job: jobId }).populate("job applicant");
 };
 
 const getApplicationById = async (id) => {
@@ -22,7 +22,7 @@ const deleteApplication = async (id) => {
 
 module.exports = {
   createApplication,
-  getAllApplications,
+  getAllApplicationsByJobId,
   getApplicationById,
   updateApplicationStatus,
   deleteApplication,

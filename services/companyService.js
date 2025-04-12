@@ -1,7 +1,25 @@
 const Company = require("../models/Company");
+const User = require("../models/User");
 
-const createCompany = async (name, description, location, website) => {
-  return await Company.create({ name, description, location, website });
+const createCompany = async (userId,name, description, location, website,avatarUrl) => {
+  const user = await User.findById(userId);
+  if(!user){
+    throw new Error("User not found");
+  }
+  const company = await Company.create({
+    name,
+    description,
+    location,
+    website,
+    avatarUrl,
+    recruiter: user._id,
+  });
+
+  // Gán company vào user
+  user.company = company._id;
+  await user.save();
+  
+  return company;
 };
 
 const getAllCompanies = async () => {

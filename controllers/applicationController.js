@@ -1,10 +1,12 @@
 const applicationService = require("../services/applicationService");
 
+
+//Tạo đơn ứng tuyển
 const createApplication = async (req, res) => {
   try {
-    const { job, resume, coverLetter } = req.body;
-    const applicant = req.user.id;
-    const application = await applicationService.createApplication(job, applicant, resume, coverLetter);
+    const { job, coverLetter } = req.body;
+    const applicant = req.user.userId;
+    const application = await applicationService.createApplication(job, applicant, coverLetter);
     
     res.status(201).json(application);
   } catch (err) {
@@ -12,15 +14,19 @@ const createApplication = async (req, res) => {
   }
 };
 
-const getAllApplications = async (req, res) => {
+//Lấy danh sách ứng viên
+const getAllApplicationsByJobId = async (req, res) => {
   try {
-    const applications = await applicationService.getAllApplications();
+    const { jobId } = req.params;
+    const applications = await applicationService.getAllApplicationsByJobId(jobId);
     res.status(200).json(applications);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
+
+//Lấy cụ thể thông tin ứng tuyển
 const getApplicationById = async (req, res) => {
   try {
     const application = await applicationService.getApplicationById(req.params.id);
@@ -30,6 +36,7 @@ const getApplicationById = async (req, res) => {
   }
 };
 
+//Cập nhật trạng thái ứng tuyển của ứng viên
 const updateApplicationStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -51,7 +58,7 @@ const deleteApplication = async (req, res) => {
 
 module.exports = {
   createApplication,
-  getAllApplications,
+  getAllApplicationsByJobId,
   getApplicationById,
   updateApplicationStatus,
   deleteApplication,

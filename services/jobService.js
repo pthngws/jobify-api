@@ -1,8 +1,23 @@
 const Job = require("../models/Job");
+const User = require("../models/User");
 
-const createJob = async (jobData) => {
-  const job = new Job(jobData);
-  await job.save();
+
+const createJob = async ({userId,title,description,requirements,location,salary,closingDate}) => {
+  const user = await User.findById(userId);
+  console.log(user);
+  if (!user || !user.company) {
+    throw new Error("User not found or user has no associated company");
+  }
+  const job = await Job.create({
+    title,
+    description,
+    requirements,
+    location,
+    salary,
+    closingDate,
+    company: user.company,
+  });
+  
   return job;
 };
 
@@ -18,7 +33,7 @@ const getJobById = async (jobId) => {
   return job;
 };
 
-const updateJob = async (jobId, jobData) => {
+const updateJob = async (jobId, {title,description,requirements,location,salary,closingDate}) => {
   const updatedJob = await Job.findByIdAndUpdate(jobId, jobData, { new: true });
   if (!updatedJob) {
     throw new Error("Không tìm thấy công việc để cập nhật!");
