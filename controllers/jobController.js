@@ -22,6 +22,16 @@ const getAllJobs = async (req, res) => {
   }
 };
 
+
+const getJobsByCompany = async (req, res) => {
+  try {
+    const companyId = req.params.companyId;
+    const jobs = await jobService.getAllJobsByCompany(companyId);
+    res.status(200).json({ success: true, data: jobs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 // Lấy công việc theo ID
 const getJobById = async (req, res) => {
   try {
@@ -53,4 +63,4 @@ const deleteJob = async (req, res) => {
   }
 };
 
-module.exports = { createJob, getAllJobs, getJobById, updateJob, deleteJob };
+module.exports = { createJob, getAllJobs,getJobsByCompany, getJobById, updateJob, deleteJob };

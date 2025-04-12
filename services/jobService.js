@@ -22,7 +22,12 @@ const createJob = async ({userId,title,description,requirements,location,salary,
 };
 
 const getAllJobs = async () => {
-  return await Job.find();
+  return await Job.find().populate("company");
+};
+
+const getAllJobsByCompany = async (companyId) => {
+  const jobs = await Job.find({ company: companyId }).populate("company");
+  return jobs;
 };
 
 const getJobById = async (jobId) => {
@@ -52,6 +57,7 @@ const deleteJob = async (jobId) => {
 module.exports = {
   createJob,
   getAllJobs,
+  getAllJobsByCompany,
   getJobById,
   updateJob,
   deleteJob,

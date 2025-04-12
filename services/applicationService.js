@@ -5,7 +5,7 @@ const createApplication = async (job, applicant, coverLetter) => {
 };
 
 const getAllApplicationsByJobId = async (jobId) => {
-  return await Application.find({ job: jobId }).populate("job applicant");
+  return await Application.find({ job: jobId }).populate("applicant", "email fullName avatarUrl resumeUrl");
 };
 
 const getApplicationById = async (id) => {

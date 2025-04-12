@@ -15,4 +15,6 @@ router.put("/:id",authenticateToken, authorizeRole("recruit"), jobController.upd
 //Xóa công việc
 router.delete("/:id",authenticateToken, authorizeRole("recruit,admin"), jobController.deleteJob);
 
+router.get("/company/:companyId", jobController.getJobsByCompany);
+
 module.exports = router;
