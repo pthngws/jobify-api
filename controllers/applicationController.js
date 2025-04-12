@@ -1,4 +1,5 @@
 const applicationService = require("../services/applicationService");
+const jobService = require("../services/jobService")
 
 // Tạo đơn ứng tuyển
 const createApplication = async (req, res) => {
@@ -25,6 +26,11 @@ const createApplication = async (req, res) => {
 const getAllApplicationsByJobId = async (req, res) => {
   try {
     const { jobId } = req.params;
+
+    const userId = req.user.userId;
+
+    await jobService.checkJobOwnership(jobId,userId)
+
     const applications = await applicationService.getAllApplicationsByJobId(jobId);
 
     res.status(200).json({
@@ -43,6 +49,7 @@ const getAllApplicationsByJobId = async (req, res) => {
 const getAllApplicationsByJobApplicant = async (req, res) => {
   try {
     const { userId } = req.user;
+
     const applications = await applicationService.getApplicationsByApplicant(userId);
 
     res.status(200).json({
@@ -60,8 +67,11 @@ const getAllApplicationsByJobApplicant = async (req, res) => {
 // Lấy cụ thể thông tin ứng tuyển
 const getApplicationById = async (req, res) => {
   try {
-    const application = await applicationService.getApplicationById(req.params.applicationId);
+    const { userId } = req.user;
+    const {applicationId} = req.params;
+    await applicationService.checkApplicationOwnership(applicationId,userId)
 
+    const application = await applicationService.getApplicationById(applicationId);
     if (!application) {
       return res.status(404).json({
         success: false,
@@ -85,7 +95,10 @@ const getApplicationById = async (req, res) => {
 const updateApplicationStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const updatedApplication = await applicationService.updateApplicationStatus(req.params.applicationId, status);
+    const { userId } = req.user;
+    const {applicationId} = req.params;
+    await applicationService.checkApplicationOwnership(applicationId,userId)
+    const updatedApplication = await applicationService.updateApplicationStatus(applicationId, status);
 
     res.status(200).json({
       success: true,
@@ -103,7 +116,10 @@ const updateApplicationStatus = async (req, res) => {
 // Xóa đơn ứng tuyển
 const deleteApplication = async (req, res) => {
   try {
-    await applicationService.deleteApplication(req.params.applicationId);
+    const { userId } = req.user;
+    const {applicationId} = req.params;
+    await applicationService.checkApplicationOwnership(applicationId,userId)
+    await applicationService.deleteApplication(applicationId);
 
     res.status(200).json({
       success: true,

@@ -1,6 +1,20 @@
 const Job = require("../models/Job");
 const User = require("../models/User");
 
+const checkJobOwnership = async (jobId, userId) => {
+  const job = await Job.findById(jobId).populate("company");
+
+  if (!job) {
+    throw new Error("Công việc không tồn tại!");
+  }
+
+  // Kiểm tra xem công ty có thuộc về người dùng không
+  if (job.company.recruiter.toString() !== userId) {
+    throw new Error("Bạn không có quyền truy cập công việc này!");
+  }
+
+  return job;
+};
 
 const createJob = async ({userId,title,description,requirements,location,salary,closingDate}) => {
   const user = await User.findById(userId);
@@ -55,6 +69,7 @@ const deleteJob = async (jobId) => {
 };
 
 module.exports = {
+  checkJobOwnership,
   createJob,
   getAllJobs,
   getAllJobsByCompany,

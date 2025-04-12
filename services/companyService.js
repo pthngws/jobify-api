@@ -1,6 +1,21 @@
 const Company = require("../models/Company");
 const User = require("../models/User");
 
+const checkCompanyOwnership = async (companyId, userId) => {
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new Error("Công ty không tồn tại!");
+  }
+
+  // Kiểm tra xem công ty có thuộc về người dùng không
+  if (company.recruiter.toString() !== userId) {
+    throw new Error("Bạn không có quyền truy cập công ty này!");
+  }
+
+  return company;
+};
+
 const createCompany = async (userId,name, description, location, website,avatarUrl) => {
   const user = await User.findById(userId);
   if(!user){
@@ -39,6 +54,7 @@ const deleteCompany = async (id) => {
 };
 
 module.exports = {
+  checkCompanyOwnership,
   createCompany,
   getAllCompanies,
   getCompanyById,
