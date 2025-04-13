@@ -28,14 +28,13 @@ const sendOtpEmail = async (email, otp) => {
 const storeOtp = async (email, password, role) => {
   const otp = generateOtp();
   await redisClient.set(`otp:${email}`, JSON.stringify({ otp, email, password, role }), {
-    EX: 300, // Hết hạn sau 5 phút
+    EX: 300, 
   });
   await sendOtpEmail(email, otp);
 };
 
 const verifyOtp = async (email, otp) => {
 
-    // Lấy dữ liệu OTP từ Redis
     const data = await redisClient.get(`otp:${email}`);
     if (!data) {
       throw new Error("OTP hết hạn hoặc không hợp lệ!");

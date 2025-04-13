@@ -19,8 +19,12 @@ const checkCompanyOwnership = async (companyId, userId) => {
 const createCompany = async (userId,name, description, location, website,avatarUrl) => {
   const user = await User.findById(userId);
   if(!user){
-    throw new Error("User not found");
+    throw new Error("Không tìm thấy người dùng!");
   }
+  if (user.company) {
+    throw new Error("Bạn đã có công ty rồi!");
+  }
+
   const company = await Company.create({
     name,
     description,

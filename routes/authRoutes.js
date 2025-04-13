@@ -8,7 +8,6 @@ router.post("/login", authController.login);
 router.post("/logout", authController.logout);
 router.post("/complete-registration", authController.completeRegistration);
 router.post("/forgot-password", authController.forgetPassword);
-router.post("/comfirm-otp", authController.comfirmOtp);
 router.post("/reset-password", authController.resetPassword);
 router.post("/refresh-token", authController.refreshToken);
 router.get("/google", authController.googleLogin);

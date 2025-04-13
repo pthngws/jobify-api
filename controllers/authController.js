@@ -94,28 +94,14 @@ const forgetPassword = async (req, res) => {
   }
 };
 
-// Xác thực OTP
-const comfirmOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    await otpService.verifyOtp(email, otp);
-
-    res.status(201).json({
-      success: true,
-      message: "Xác thực OTP thành công!"
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    });
-  }
-};
 
 // Đặt lại mật khẩu
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
+    const {email,otp, newPassword } = req.body;
+
+    await otpService.verifyOtp(email, otp);
+
     await authService.resetPasswordUser(email, newPassword);
 
     res.status(201).json({
@@ -237,7 +223,6 @@ module.exports = {
   logout,
   completeRegistration,
   forgetPassword,
-  comfirmOtp,
   resetPassword,
   refreshToken,
   googleLogin,
