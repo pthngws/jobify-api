@@ -105,4 +105,4 @@ const resetPasswordUser = async(email,newPassword)=>{
   }};
 }
 
-module.exports = { registerUser, loginUser, resetPasswordUser,refreshAccessToken };
+module.exports = { registerUser, loginUser, resetPasswordUser,refreshAccessToken,generateTokens };

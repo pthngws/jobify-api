@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const passport = require("../config/passport"); // Import passport
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
@@ -10,4 +11,7 @@ router.post("/forgot-password", authController.forgetPassword);
 router.post("/comfirm-otp", authController.comfirmOtp);
 router.post("/reset-password", authController.resetPassword);
 router.post("/refresh-token", authController.refreshToken);
+router.get("/google", authController.googleLogin);
+router.get("/google/callback", passport.authenticate("google", { session: false }), authController.googleCallback);
+
 module.exports = router;

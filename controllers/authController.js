@@ -1,107 +1,186 @@
 const authService = require("../services/authService");
 const otpService = require("../services/otpService");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const redisClient = require("../config/redisClient");
+const passport = require("passport");
+const { generateTokens } = require("../services/authService");
 
-// Đăng ký người dùng mới
+
+const googleLogin = passport.authenticate("google", {
+  scope: ["profile", "email"],
+});
+
+// Callback sau khi Google xác thực
+const googleCallback = async (req, res) => {
+  try {
+    const user = req.user;
+    const { accessToken, refreshToken } = await generateTokens(user);
+
+    res.status(200).json({
+      success: true,
+      message: "Đăng nhập bằng Google thành công!",
+      data: {
+        user: {
+          _id: user._id,
+          email: user.email,
+          role: user.role,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+        },
+        accessToken,
+        refreshToken,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// Đăng ký
 const register = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-
-    // Kiểm tra nếu email đã tồn tại
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(400).json({ error: "Email đã tồn tại!" });
+      return res.status(400).json({
+        success: false,
+        error: "Email đã tồn tại!"
+      });
     }
 
-    // Gửi OTP & lưu vào Redis
     await otpService.storeOtp(email, password, role);
 
-    res.status(200).json({ message: "OTP đã được gửi đến email của bạn!" });
+    res.status(200).json({
+      success: true,
+      message: "OTP đã được gửi đến email của bạn!"
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
-const forgetPassword = async (req,res)=>{
-  try{
-    const {email} = req.body;
-  const existingUser = await User.findOne({ email });
-  if (!existingUser) {
-    return res.status(400).json({ error: "Email không tồn tại!" });
-  }
-  await otpService.storeOtpResetPassword(email);
-  res.status(200).json({ message: "OTP đã được gửi đến email của bạn!" });
-  
+// Quên mật khẩu
+const forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const existingUser = await User.findOne({ email });
+
+    if (!existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: "Email không tồn tại!"
+      });
+    }
+
+    await otpService.storeOtpResetPassword(email);
+
+    res.status(200).json({
+      success: true,
+      message: "OTP đã được gửi đến email của bạn!"
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
-const comfirmOtp = async(req,res) =>{
-  try{
+// Xác thực OTP
+const comfirmOtp = async (req, res) => {
+  try {
     const { email, otp } = req.body;
-    await otpService.verifyOtp(email,otp);
-    res.status(201).json({ message: "Xác thực OTP thành công!" });
+    await otpService.verifyOtp(email, otp);
+
+    res.status(201).json({
+      success: true,
+      message: "Xác thực OTP thành công!"
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
-const resetPassword =async(req,res) =>{
-  try{
-    const {email, newPassword} = req.body;
-    await authService.resetPasswordUser(email,newPassword);
-    res.status(201).json({ message: "Đổi mật khẩu thành công!" });
+// Đặt lại mật khẩu
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    await authService.resetPasswordUser(email, newPassword);
+
+    res.status(201).json({
+      success: true,
+      message: "Đổi mật khẩu thành công!"
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
+// Hoàn tất đăng ký
 const completeRegistration = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    // Xác thực OTP & lấy thông tin từ Redis
     const { password, role } = await otpService.verifyOtp(email, otp);
-
-    // Lưu vào database
     const { user } = await authService.registerUser(email, password, role);
-    res.status(201).json({ message: "Đăng ký thành công!", user });
+
+    res.status(201).json({
+      success: true,
+      message: "Đăng ký thành công!",
+      data: user
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
-const refreshToken = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      return res.status(400).json({ error: "Thiếu Refresh Token!" });
-    }
-
-    const { accessToken } = await authService.refreshAccessToken(refreshToken);
-    res.status(200).json({ accessToken });
-  } catch (error) {
-    res.status(401).json({ error: error.message });
-  }
-};
-// Đăng nhập người dùng
+// Đăng nhập
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { user, accessToken,refreshToken } = await authService.loginUser(email, password);
-    res.status(200).json({ message: "Đăng nhập thành công!", user, accessToken,refreshToken });
+    const { user, accessToken, refreshToken } = await authService.loginUser(email, password);
+
+    res.status(200).json({
+      success: true,
+      message: "Đăng nhập thành công!",
+      data: { 
+        user,
+        accessToken, 
+        refreshToken 
+      }
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
+
+// Đăng xuất
 const logout = async (req, res) => {
   try {
-    const refreshToken = req.cookies["refresh_token"]; 
-
+    const refreshToken = req.cookies["refresh_token"];
     if (refreshToken) {
       const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
       const { sessionId, userId } = decoded;
+
       const key = `refreshTokens:${userId}`;
       const userTokens = await redisClient.sMembers(key);
       const tokenToRemove = userTokens.find((token) => {
@@ -110,15 +189,57 @@ const logout = async (req, res) => {
       });
 
       if (tokenToRemove) {
-        await redisClient.sRem(key, tokenToRemove); 
+        await redisClient.sRem(key, tokenToRemove);
       }
+
       res.clearCookie("refresh_token");
     }
 
-    res.status(200).json({ message: "Đăng xuất thành công" });
+    res.status(200).json({
+      success: true,
+      message: "Đăng xuất thành công!"
+    });
   } catch (error) {
-    res.status(500).json({ error: "Đã có lỗi xảy ra khi đăng xuất!" });
+    res.status(500).json({
+      success: false,
+      error: "Đã có lỗi xảy ra khi đăng xuất!"
+    });
   }
 };
 
-module.exports = { register, login, logout, completeRegistration, forgetPassword, comfirmOtp, resetPassword, refreshToken};
+// Refresh Token
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: "Thiếu Refresh Token!"
+      });
+    }
+
+    const { accessToken } = await authService.refreshAccessToken(refreshToken);
+    res.status(200).json({
+      success: true,
+      data: { accessToken }
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  completeRegistration,
+  forgetPassword,
+  comfirmOtp,
+  resetPassword,
+  refreshToken,
+  googleLogin,
+  googleCallback,
+};
