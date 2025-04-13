@@ -5,18 +5,41 @@ const authenticateToken = require("../middlewares/authenticateToken");
 const authorizeRole = require("../middlewares/authorizeRole");
 
 // Tạo công ty
-router.post("/", authenticateToken, authorizeRole("recruit"), companyController.createCompany);
+router.post(
+    "/", 
+    authenticateToken, 
+    authorizeRole("recruit"), 
+    companyController.createCompany
+);
 
 // Lấy danh sách công ty
-router.get("/", authenticateToken, companyController.getAllCompanies);
+router.get(
+    "/", 
+    authenticateToken, 
+    companyController.getAllCompanies
+);
 
 // Lấy công ty theo id
-router.get("/:companyId", authenticateToken, companyController.getCompanyById);
+router.get(
+    "/:companyId", 
+    authenticateToken, 
+    companyController.getCompanyById
+);
 
 // Cập nhật công ty
-router.put("/:companyId", authenticateToken, authorizeRole("recruit"), companyController.updateCompany);
+router.put(
+    "/:companyId", 
+    authenticateToken, 
+    authorizeRole("recruit"), 
+    companyController.updateCompany
+);
 
 // Xóa công ty
-router.delete("/:companyId", authenticateToken, authorizeRole("recruit,admin"), companyController.deleteCompany);
+router.delete(
+    "/:companyId", 
+    authenticateToken, 
+    authorizeRole("recruit,admin"), 
+    companyController.deleteCompany
+);
 
 module.exports = router;

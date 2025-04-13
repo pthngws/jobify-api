@@ -4,7 +4,20 @@ const jobService = require("../services/jobService");
 const createJob = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { title, description, requirements, location, salary, closingDate } = req.body;
+    const {
+      title,
+      description,
+      requirements,
+      location,
+      salary,
+      jobType,
+      experienceLevel,
+      category,
+      status,
+      benefits,
+      workHours,
+      closingDate,
+    } = req.body;
 
     const job = await jobService.createJob({
       userId,
@@ -13,7 +26,13 @@ const createJob = async (req, res) => {
       requirements,
       location,
       salary,
-      closingDate
+      jobType,
+      experienceLevel,
+      category,
+      status,
+      benefits,
+      workHours,
+      closingDate,
     });
 
     res.status(201).json({ success: true, data: job });
@@ -32,14 +51,35 @@ const getAllJobs = async (req, res) => {
   }
 };
 
+// Tìm kiếm công việc
+const searchJobs = async (req, res) => {
+  try {
+    const { keyword, category, jobType, experienceLevel, location, status } =
+      req.query;
+
+    const jobs = await jobService.searchJobs({
+      keyword,
+      category,
+      jobType,
+      experienceLevel,
+      location,
+      status,
+    });
+
+    res.status(200).json({ success: true, data: jobs });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 // Lấy danh sách công việc theo công ty
 const getJobsByCompany = async (req, res) => {
   try {
     const companyId = req.params.companyId;
     const jobs = await jobService.getAllJobsByCompany(companyId);
     res.status(200).json({ success: true, data: jobs });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -53,22 +93,41 @@ const getJobById = async (req, res) => {
   }
 };
 
-// Cập nhật công việc (check quyền)
+// Cập nhật công việc
 const updateJob = async (req, res) => {
   try {
     const userId = req.user.userId;
     const jobId = req.params.jobId;
+    const {
+      title,
+      description,
+      requirements,
+      location,
+      salary,
+      jobType,
+      experienceLevel,
+      category,
+      status,
+      benefits,
+      workHours,
+      closingDate,
+    } = req.body;
 
     await jobService.checkJobOwnership(jobId, userId);
 
-    const { title, description, requirements, location, salary, closingDate } = req.body;
     const updatedJob = await jobService.updateJob(jobId, {
       title,
       description,
       requirements,
       location,
       salary,
-      closingDate
+      jobType,
+      experienceLevel,
+      category,
+      status,
+      benefits,
+      workHours,
+      closingDate,
     });
 
     res.status(200).json({ success: true, data: updatedJob });
@@ -77,7 +136,7 @@ const updateJob = async (req, res) => {
   }
 };
 
-// Xóa công việc (check quyền)
+// Xóa công việc
 const deleteJob = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -95,8 +154,9 @@ const deleteJob = async (req, res) => {
 module.exports = {
   createJob,
   getAllJobs,
+  searchJobs,
   getJobsByCompany,
   getJobById,
   updateJob,
-  deleteJob
+  deleteJob,
 };

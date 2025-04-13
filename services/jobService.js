@@ -3,35 +3,53 @@ const User = require("../models/User");
 
 const checkJobOwnership = async (jobId, userId) => {
   const job = await Job.findById(jobId).populate("company");
-
   if (!job) {
     throw new Error("Công việc không tồn tại!");
   }
 
-  // Kiểm tra xem công ty có thuộc về người dùng không
-  if (job.company.recruiter.toString() !== userId) {
+  if (!job.company.recruiter || job.company.recruiter.toString() !== userId) {
     throw new Error("Bạn không có quyền truy cập công việc này!");
   }
 
   return job;
 };
 
-const createJob = async ({userId,title,description,requirements,location,salary,closingDate}) => {
+const createJob = async ({
+  userId,
+  title,
+  description,
+  requirements,
+  location,
+  salary,
+  jobType,
+  experienceLevel,
+  category,
+  status,
+  benefits,
+  workHours,
+  closingDate,
+}) => {
   const user = await User.findById(userId);
-  console.log(user);
   if (!user || !user.company) {
-    throw new Error("User not found or user has no associated company");
+    throw new Error("Người dùng không tồn tại hoặc không có công ty liên kết!");
   }
+
   const job = await Job.create({
     title,
     description,
     requirements,
+    company: user.company,
     location,
     salary,
+    jobType,
+    experienceLevel,
+    category,
+    status,
+    benefits,
+    workHours,
     closingDate,
-    company: user.company,
   });
-  
+
   return job;
 };
 
@@ -40,20 +58,53 @@ const getAllJobs = async () => {
 };
 
 const getAllJobsByCompany = async (companyId) => {
-  const jobs = await Job.find({ company: companyId }).populate("company");
-  return jobs;
+  return await Job.find({ company: companyId }).populate("company");
 };
 
 const getJobById = async (jobId) => {
-  const job = await Job.findById(jobId);
+  const job = await Job.findById(jobId).populate("company");
   if (!job) {
     throw new Error("Công việc không tồn tại!");
   }
   return job;
 };
 
-const updateJob = async (jobId, {title,description,requirements,location,salary,closingDate}) => {
-  const updatedJob = await Job.findByIdAndUpdate(jobId, jobData, { new: true });
+const updateJob = async (
+  jobId,
+  {
+    title,
+    description,
+    requirements,
+    location,
+    salary,
+    jobType,
+    experienceLevel,
+    category,
+    status,
+    benefits,
+    workHours,
+    closingDate,
+  }
+) => {
+  const updateData = {
+    title,
+    description,
+    requirements,
+    location,
+    salary,
+    jobType,
+    experienceLevel,
+    category,
+    status,
+    benefits,
+    workHours,
+    closingDate,
+  };
+
+  const updatedJob = await Job.findByIdAndUpdate(jobId, updateData, {
+    new: true,
+    runValidators: true,
+  });
   if (!updatedJob) {
     throw new Error("Không tìm thấy công việc để cập nhật!");
   }
@@ -68,6 +119,43 @@ const deleteJob = async (jobId) => {
   return deletedJob;
 };
 
+const searchJobs = async ({
+  keyword,
+  category,
+  jobType,
+  experienceLevel,
+  location,
+  status,
+}) => {
+  const query = {};
+
+  if (keyword) {
+    query.$text = { $search: keyword };
+  }
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (jobType) {
+    query.jobType = jobType;
+  }
+
+  if (experienceLevel) {
+    query.experienceLevel = experienceLevel;
+  }
+
+  if (location) {
+    query.location = { $regex: location, $options: "i" };
+  }
+
+  if (status) {
+    query.status = status;
+  }
+
+  return await Job.find(query).populate("company");
+};
+
 module.exports = {
   checkJobOwnership,
   createJob,
@@ -76,4 +164,5 @@ module.exports = {
   getJobById,
   updateJob,
   deleteJob,
+  searchJobs,
 };
