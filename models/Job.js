@@ -11,7 +11,7 @@ const JobSchema = new mongoose.Schema({
     type: String,
     required: [true, "Mô tả công việc là bắt buộc"],
     trim: true,
-    minlength: [50, "Mô tả phải có ít nhất 50 ký tự"],
+    minlength: [10, "Mô tả phải có ít nhất 10 ký tự"],
   },
   requirements: {
     type: [String],

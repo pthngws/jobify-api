@@ -17,26 +17,30 @@ const googleCallback = async (req, res) => {
     const user = req.user;
     const { accessToken, refreshToken } = await generateTokens(user);
 
-    res.status(200).json({
-      success: true,
-      message: "Đăng nhập bằng Google thành công!",
-      data: {
-        user: {
-          _id: user._id,
-          email: user.email,
-          role: user.role,
-          fullName: user.fullName,
-          avatarUrl: user.avatarUrl,
-        },
-        accessToken,
-        refreshToken,
-      },
-    });
+    // Prepare user data for redirect
+    const userData = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      fullName: user.fullName,
+      avatarUrl: user.avatarUrl,
+      company: user.company
+    };
+
+    // Redirect to frontend with tokens and user data as query params
+    const redirectUrl = `http://localhost:5173/login?accessToken=${encodeURIComponent(
+      accessToken
+    )}&refreshToken=${encodeURIComponent(
+      refreshToken
+    )}&user=${encodeURIComponent(JSON.stringify(userData))}`;
+
+    res.redirect(redirectUrl);
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-    });
+    // Redirect with error message if something goes wrong
+    const redirectUrl = `http://localhost:5173/login?error=${encodeURIComponent(
+      "Đăng nhập bằng Google thất bại: " + error.message
+    )}`;
+    res.redirect(redirectUrl);
   }
 };
 

@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     type: String
   },
   avatarUrl: { 
-    default:"",
+    default:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
     type: String 
   },
   role: { 

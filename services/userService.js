@@ -44,10 +44,18 @@ const updateUserProfile = async (userId, avatar, cv, fullname) => {
   let cvUrl = user.resumeUrl;
   if (cv) {
     try {
-      const cvUpload = await cloudinary.uploader.upload(cv, {
-        folder: "cv",
-        allowed_formats: ["pdf", "doc", "docx"],
-      });
+    const cvUpload = await cloudinary.uploader.upload(cv, {
+      folder: "resume",
+      resource_type: "raw", // ✅ QUAN TRỌNG: PDF là 'raw'
+      allowed_formats: ["pdf", "doc", "docx"],
+      upload_preset:"ml_default",
+      type: "upload",            // đảm bảo file là public
+      use_filename: true,        // giữ tên gốc
+      unique_filename: false,    // không thêm chuỗi ngẫu nhiên
+      access_mode: "public",    // <- Đảm bảo file có thể truy cập công khai
+    });
+
+      
       cvUrl = cvUpload.secure_url;
 
       // Xóa file CV sau khi upload thành công

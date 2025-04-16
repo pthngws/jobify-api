@@ -88,6 +88,7 @@ const loginUser = async (email, password) => {
     fullname: user.fullName,
     avatarUrl: user.avatarUrl,
     resumeUrl: user.resumeUrl,
+    company: user.company,
   }, accessToken, refreshToken };
 
 };

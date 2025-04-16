@@ -23,6 +23,11 @@ const checkApplicationOwnership = async (applicationId, userId) => {
 };
 
 const createApplication = async (job, applicant, coverLetter) => {
+  const existing = await Application.findOne({ job, applicant });
+
+  if (existing) {
+    throw new Error("Bạn đã ứng tuyển công việc này rồi.");
+  }
   return await Application.create({ job, applicant, coverLetter });
 };
 
